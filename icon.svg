@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="40%" r="68%">
+      <stop offset="0%" stop-color="#3b167a"/>
+      <stop offset="50%" stop-color="#190936"/>
+      <stop offset="100%" stop-color="#090315"/>
+    </radialGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="44%" r="44%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.95"/>
+      <stop offset="42%" stop-color="#fde047" stop-opacity="0.58"/>
+      <stop offset="72%" stop-color="#f43f5e" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonDisc" cx="42%" cy="36%" r="64%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="55%" stop-color="#fef08a"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </radialGradient>
+    <linearGradient id="capeOut" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="45%" stop-color="#140c2e"/>
+      <stop offset="100%" stop-color="#05030d"/>
+    </linearGradient>
+    <linearGradient id="capeIn" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ff3b5c"/>
+      <stop offset="48%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#5c0a18"/>
+    </linearGradient>
+    <radialGradient id="skin" cx="44%" cy="30%" r="68%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="52%" stop-color="#ece5ff"/>
+      <stop offset="86%" stop-color="#cfc2ec"/>
+      <stop offset="100%" stop-color="#b4a3dc"/>
+    </radialGradient>
+    <linearGradient id="hair" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#4338ca"/>
+      <stop offset="28%" stop-color="#171130"/>
+      <stop offset="100%" stop-color="#060312"/>
+    </linearGradient>
+    <radialGradient id="eyeBlue" cx="38%" cy="32%" r="66%">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="42%" stop-color="#38bdf8"/>
+      <stop offset="80%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </radialGradient>
+    <linearGradient id="goldMed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="55%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Midnight Purple Night Sky -->
+  <rect width="512" height="512" fill="url(#sky)"/>
+
+  <!-- Subtle Starlight & Sparkles -->
+  <g fill="#fde047" opacity="0.85">
+    <circle cx="76" cy="96" r="3.2"/>
+    <circle cx="432" cy="108" r="2.8"/>
+    <circle cx="446" cy="252" r="2.5"/>
+    <circle cx="64" cy="272" r="2.6"/>
+    <circle cx="114" cy="412" r="2.2" fill="#f472b6"/>
+    <circle cx="408" cy="404" r="2.5" fill="#c084fc"/>
+  </g>
+  <!-- Four-point magical stars -->
+  <path d="M98 158 L102 146 L106 158 L118 162 L106 166 L102 178 L98 166 L86 162 Z" fill="#f472b6" opacity="0.9"/>
+  <path d="M412 168 L415 158 L418 168 L428 171 L418 174 L415 184 L412 174 L402 171 Z" fill="#fde047" opacity="0.95"/>
+  <path d="M256 42 L259 33 L262 42 L271 45 L262 48 L259 57 L256 48 L247 45 Z" fill="#c084fc" opacity="0.85"/>
+
+  <!-- Character & Moon Group -->
+  <g transform="translate(256, 256) scale(1.0) translate(-256, -256)">
+    <!-- Moon Halo + Glowing Full Moon -->
+    <circle cx="256" cy="222" r="215" fill="url(#moonGlow)"/>
+    <circle cx="256" cy="216" r="146" fill="url(#moonDisc)" opacity="0.94"/>
+    <circle cx="212" cy="166" r="18" fill="#f59e0b" opacity="0.14"/>
+    <circle cx="314" cy="238" r="24" fill="#f59e0b" opacity="0.12"/>
+    <circle cx="272" cy="126" r="11" fill="#f59e0b" opacity="0.13"/>
+
+    <!-- Two Stylized Bats -->
+    <g transform="translate(76, 86) rotate(-14) scale(1.7)">
+      <path d="M20 11 C13 3, 5 3, 1 11 C6 11, 8 15, 11 16 C14 13, 17 14, 20 14 Z" fill="#120726" stroke="#c084fc" stroke-width="1.2"/>
+      <path d="M20 11 C27 3, 35 3, 39 11 C34 11, 32 15, 29 16 C26 13, 23 14, 20 14 Z" fill="#120726" stroke="#c084fc" stroke-width="1.2"/>
+      <circle cx="20" cy="11.5" r="3.4" fill="#120726"/>
+      <circle cx="18.8" cy="11" r="0.85" fill="#38bdf8"/>
+      <circle cx="21.2" cy="11" r="0.85" fill="#38bdf8"/>
+    </g>
+    <g transform="translate(366, 92) rotate(14) scale(1.5)">
+      <path d="M20 11 C13 3, 5 3, 1 11 C6 11, 8 15, 11 16 C14 13, 17 14, 20 14 Z" fill="#120726" stroke="#c084fc" stroke-width="1.2"/>
+      <path d="M20 11 C27 3, 35 3, 39 11 C34 11, 32 15, 29 16 C26 13, 23 14, 20 14 Z" fill="#120726" stroke="#c084fc" stroke-width="1.2"/>
+      <circle cx="20" cy="11.5" r="3.4" fill="#120726"/>
+      <circle cx="18.8" cy="11" r="0.85" fill="#38bdf8"/>
+      <circle cx="21.2" cy="11" r="0.85" fill="#38bdf8"/>
+    </g>
+
+    <!-- Dracula Character Scaled & Centered from 180x180 -> 450x450 -->
+    <g transform="translate(256, 286) scale(2.48) translate(-90, -96)">
+      <!-- Flowing Cape Wings -->
+      <path d="M84 96 L24 52 C15 92, 10 132, 20 166 C38 156, 54 162, 68 172 L88 164 Z" fill="url(#capeOut)" stroke="#6d28d9" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M84 100 L33 63 C25 95, 21 128, 28 156 C43 147, 56 153, 68 163 L86 157 Z" fill="url(#capeIn)"/>
+      <path d="M96 96 L156 52 C165 92, 170 132, 160 166 C142 156, 126 162, 112 172 L92 164 Z" fill="url(#capeOut)" stroke="#6d28d9" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M96 100 L147 63 C155 95, 159 128, 152 156 C137 147, 124 153, 112 163 L94 157 Z" fill="url(#capeIn)"/>
+
+      <!-- High Pointed Dracula Collar -->
+      <path d="M56 124 L36 64 L74 88 L90 96 L106 88 L144 64 L124 124 Z" fill="url(#capeOut)" stroke="#8b5cf6" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M61 120 L44 74 L76 92 L90 100 L104 92 L136 74 L119 120 Z" fill="url(#capeIn)"/>
+
+      <!-- Tuxedo Suit & Crimson Bowtie + Golden Medallion -->
+      <path d="M62 122 L90 112 L118 122 L124 170 C102 176, 78 176, 56 170 Z" fill="#0b0817" stroke="#312e81" stroke-width="1"/>
+      <polygon points="90,115 76,125 90,156 104,125" fill="#f8fafc"/>
+      <path d="M90 124 L74 117 L74 131 Z M90 124 L106 117 L106 131 Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="0.7" stroke-linejoin="round"/>
+      <circle cx="90" cy="124" r="5" fill="url(#goldMed)" stroke="#991b1b" stroke-width="1.4"/>
+
+      <!-- Neck -->
+      <path d="M80 106 L80 121 Q90 127 100 121 L100 106 Z" fill="#cfc2ec"/>
+
+      <!-- Pointed Vampire Ears -->
+      <path d="M58 66 L41 55 L54 80 Z" fill="url(#skin)" stroke="#a78bfa" stroke-width="1.1" stroke-linejoin="round"/>
+      <path d="M122 66 L139 55 L126 80 Z" fill="url(#skin)" stroke="#a78bfa" stroke-width="1.1" stroke-linejoin="round"/>
+
+      <!-- Sculpted Angular Dracula Head -->
+      <path d="M57 56 C56 37, 69 27, 90 27 C111 27, 124 37, 123 56 L119 83 C117 97, 103 115, 90 117 C77 115, 63 97, 61 83 Z" fill="url(#skin)" stroke="#c4b5fd" stroke-width="0.9"/>
+
+      <!-- Cheekbone Contours -->
+      <path d="M63 82 Q68 96 79 106" fill="none" stroke="#b8a7e6" stroke-width="2.1" stroke-linecap="round" opacity="0.7"/>
+      <path d="M117 82 Q112 96 101 106" fill="none" stroke="#b8a7e6" stroke-width="2.1" stroke-linecap="round" opacity="0.7"/>
+
+      <!-- Glossy Slicked-Back Black Hair + Widow's Peak -->
+      <path d="M55 64 C51 43, 57 22, 90 18 C123 22, 129 43, 125 64 C122 53, 117 44, 108 41 C100 39, 94 45, 90 55 C86 45, 80 39, 72 41 C63 44, 58 53, 55 64 Z" fill="url(#hair)" stroke="#4c1d95" stroke-width="0.8"/>
+      <path d="M67 28 Q90 21 113 28" fill="none" stroke="#818cf8" stroke-width="2.6" stroke-linecap="round" opacity="0.6"/>
+      <path d="M74 34 Q90 29 106 34" fill="none" stroke="#c084fc" stroke-width="1.4" stroke-linecap="round" opacity="0.45"/>
+
+      <!-- Expressive Eyebrows -->
+      <path d="M64 58 Q73 50 83 58" fill="none" stroke="#0f0921" stroke-width="3.6" stroke-linecap="round"/>
+      <path d="M97 58 Q107 50 116 58" fill="none" stroke="#0f0921" stroke-width="3.6" stroke-linecap="round"/>
+
+      <!-- Piercing Bright-Blue Cartoon Eyes -->
+      <ellipse cx="75" cy="67" rx="9" ry="7.8" fill="#ffffff" stroke="#3b0764" stroke-width="1.4"/>
+      <circle cx="76" cy="67.5" r="5.1" fill="url(#eyeBlue)"/>
+      <circle cx="76.3" cy="67.5" r="2.3" fill="#090517"/>
+      <circle cx="73.8" cy="65" r="1.9" fill="#ffffff"/>
+      <circle cx="78.2" cy="69.6" r="0.9" fill="#e0f2fe"/>
+      <path d="M65.5 64 Q75 57.5 84.5 64" fill="#312e81" opacity="0.32"/>
+
+      <ellipse cx="105" cy="67" rx="9" ry="7.8" fill="#ffffff" stroke="#3b0764" stroke-width="1.4"/>
+      <circle cx="104" cy="67.5" r="5.1" fill="url(#eyeBlue)"/>
+      <circle cx="103.7" cy="67.5" r="2.3" fill="#090517"/>
+      <circle cx="101.8" cy="65" r="1.9" fill="#ffffff"/>
+      <circle cx="106.2" cy="69.6" r="0.9" fill="#e0f2fe"/>
+      <path d="M95.5 64 Q105 57.5 114.5 64" fill="#312e81" opacity="0.32"/>
+
+      <!-- Angular Nose -->
+      <path d="M90 66 L85 83 L93 84" fill="none" stroke="#8b7ab8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- Cheeky Vampire Grin + Gleaming Fangs -->
+      <path d="M71 91 Q90 107 109 91 Q90 95 71 91 Z" fill="#4c0519" stroke="#2e1065" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M75 92 Q90 96 105 92 L103 95.5 Q90 98 77 95.5 Z" fill="#ffffff"/>
+      <polygon points="78.5,93 83.2,94.2 80.2,103.2" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.6"/>
+      <polygon points="101.5,93 96.8,94.2 99.8,103.2" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.6"/>
+      <!-- Golden Glint on Right Fang -->
+      <path d="M100 98 L100 106 M96 102 L104 102" stroke="#fef08a" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="100" cy="102" r="1.5" fill="#ffffff"/>
+    </g>
+  </g>
+</svg>

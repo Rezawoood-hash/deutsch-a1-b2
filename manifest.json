@@ -1,0 +1,92 @@
+{
+  "id": "./",
+  "name": "Babalulue",
+  "short_name": "Babalulue",
+  "description": "Babalulue — اپلیکیشن آفلاین آموزش و مرور لایتنر آلمانی A1 تا B2 (۶٬۹۳۸ مدخل، ۴۸ درس، صرف ۵زمانه، جست‌وجوی سراسری و تلفظ انسانی)",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#140829",
+  "theme_color": "#140829",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "مرور و فلش‌کارت",
+      "short_name": "مرور",
+      "url": "./index.html?tab=review",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "جست‌وجوی سراسری ۴ سطح",
+      "short_name": "جست‌وجو",
+      "url": "./index.html?tab=search",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "مرکز افعال و صرف ۶شخصی",
+      "short_name": "افعال",
+      "url": "./index.html?tab=verbs",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "ورود مستقیم به سطح B2",
+      "short_name": "سطح B2",
+      "url": "./index.html?level=B2",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
