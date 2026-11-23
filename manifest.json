@@ -1,0 +1,80 @@
+{
+  "id": "./",
+  "name": "آلمانی A1 تا B2 — اپلیکیشن جامع یکپارچه",
+  "short_name": "آلمانی A1–B2",
+  "description": "اپلیکیشن آفلاین یکپارچهٔ هر چهار سطح A1، A2، B1 و B2 (۶٬۹۳۸ مدخل: ۴۸ درس Starten Wir و Sicher! B2 + بسته‌های رسمی Goethe، telc، ECL و Grammatik aktiv B2–C1 + جست‌وجوی سراسری، صرف ۵زمانه، لایتنر و تلفظ انسانی)",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "مرور و فلش‌کارت",
+      "short_name": "مرور",
+      "url": "./index.html?tab=review",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "جست‌وجوی سراسری ۴ سطح",
+      "short_name": "جست‌وجو",
+      "url": "./index.html?tab=search",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "مرکز افعال و صرف ۶شخصی",
+      "short_name": "افعال",
+      "url": "./index.html?tab=verbs",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "ورود مستقیم به سطح B2",
+      "short_name": "سطح B2",
+      "url": "./index.html?level=B2",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
