@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e2430"/>
+      <stop offset="55%" stop-color="#11151d"/>
+      <stop offset="100%" stop-color="#090b10"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="50%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="deFlag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="33%" stop-color="#1f2937"/>
+      <stop offset="34%" stop-color="#dc2626"/>
+      <stop offset="66%" stop-color="#b91c1c"/>
+      <stop offset="67%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="45%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bg)" stroke="url(#rim)" stroke-width="14"/>
+  <circle cx="256" cy="256" r="176" fill="none" stroke="#f59e0b" stroke-width="4" opacity="0.35"/>
+  <path d="M138 112 H250 C346 112 394 166 394 256 C394 346 346 400 250 400 H138 Z M206 172 V340 H248 C302 340 326 308 326 256 C326 204 302 172 248 172 Z" fill="url(#deFlag)" stroke="#e2e8f0" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="348,84 188,266 258,266 168,430 342,232 268,232" fill="url(#bolt)" stroke="#fff7ed" stroke-width="6" stroke-linejoin="round"/>
+</svg>
