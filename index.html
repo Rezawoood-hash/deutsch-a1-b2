@@ -1122,6 +1122,10 @@ direction:ltr;
       <label class="switch"><input type="checkbox" id="setB2Grammar" onchange="toggleSetting('showB2Grammar',this.checked)"><span class="slider"></span></label>
     </div>
     <div class="srow">
+      <div class="srow-txt"><b>ادامه از آخرین کلمهٔ مطالعه‌شده</b><small>هنگام باز کردن برنامه دقیقاً از همان درس و کلمه‌ای که بسته بودی شروع می‌کند</small></div>
+      <label class="switch"><input type="checkbox" id="setAutoResume" onchange="toggleAutoResume(this.checked)"><span class="slider"></span></label>
+    </div>
+    <div class="srow">
       <div class="srow-txt"><b>پخش خودکار تلفظ در حالت تک‌کارتی</b><small>با کشیدن انگشت روی کلمهٔ بعدی، تلفظ خودکار پخش می‌شود</small></div>
       <label class="switch"><input type="checkbox" id="setCardAutoAudio" onchange="toggleSetting('cardAutoAudio',this.checked)"><span class="slider"></span></label>
     </div>
@@ -1174,8 +1178,8 @@ direction:ltr;
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script>let babaDismissed=false;function dismissBabaSplash(){if(babaDismissed)return;babaDismissed=true;const e=document.getElementById('babaSplash');if(!e)return;e.classList.add('vmp-out');setTimeout(()=>{try{e.remove();}catch(t){}},340);}setTimeout(dismissBabaSplash,1850);</script>
+<script>window.babaDismissed=false;function dismissBabaSplash(){if(window.babaDismissed)return;window.babaDismissed=true;const e=document.getElementById('babaSplash');if(e){e.classList.add('vmp-out');setTimeout(()=>{try{e.remove();}catch(t){}},340);}if(typeof window.__onBabaSplashDone==='function'){const fn=window.__onBabaSplashDone;window.__onBabaSplashDone=null;setTimeout(()=>{try{fn();}catch(t){}},120);}}setTimeout(dismissBabaSplash,1850);</script>
 <script defer src="./app.js"></script>
 </body>
-<!-- babalulue-a1-b2-v3.6-verified -->
+<!-- babalulue-a1-b2-v3.7-verified -->
 </html>

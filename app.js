@@ -1385,6 +1385,7 @@ function openSettings(){
   document.getElementById('setNotes').checked=!!prefs.showNotes;
   document.getElementById('setB2Grammar').checked=!!prefs.showB2Grammar;
   document.getElementById('setHover').checked=!!prefs.hoverMode;
+  const arEl=document.getElementById('setAutoResume'); if(arEl) arEl.checked=isAutoResumeEnabled();
   document.getElementById('setCardAutoAudio').checked=(prefs.cardAutoAudio!==false);
   refreshCacheLabel();
   refreshPwaUI();
@@ -1549,7 +1550,7 @@ function speakTTS(text, rate, seq, displayWord){
   });
 }
 
-async function speakDe(rawText, el){
+async function speakDe(rawText, el, silentFail=false){
   const text=cleanSpeakText(rawText);
   if(!text) return;
   stopAudio();
@@ -1583,7 +1584,7 @@ async function speakDe(rawText, el){
     const url=`https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=de&q=${encodeURIComponent(text.slice(0,180))}`;
     await playSource(url, aRate, seq, text, 'گویندهٔ آنلاین', 't-tts');
   }catch(e){
-    if(seq===playSeq){ setSpeakingEl(null); showToast(text, 'اتصال صوتی برقرار نشد', 't-err'); }
+    if(seq===playSeq){ setSpeakingEl(null); if(!silentFail) showToast(text, 'اتصال صوتی برقرار نشد', 't-err'); }
   }
 }
 
@@ -2156,7 +2157,7 @@ function renderWordCard(x, opts={}){
 
   const noteHtml=(prefs.showNotes && x.nt)?`<div class="wc-note">💡 ${renderLinesWithBidi(x.nt)}</div>`:'';
 
-  return `<article class="wcard ${accent} ${mastered?'is-mastered':''}">
+  return `<article class="wcard ${accent} ${mastered?'is-mastered':''}" data-wid="${esc(x.id)}">
     <div class="wc-head">
       <div class="wc-de-side">
         <div class="wc-word-line">
@@ -2404,6 +2405,7 @@ function scGo(delta, fromSwipe=false){
   setActiveDeckIdx(target);
   if(scContext==='verbs') renderVerbsTab();
   else renderPackDetail();
+  saveResumeStateNow();
   if(prefs.cardAutoAudio!==false){
     scheduleCardAutoSpeak(fromSwipe?75:115);
   }else{
@@ -2788,6 +2790,7 @@ function renderPackDetail(){
     attachSingleCardSwipe();
     updatePackAudioBtnLive();
     if(filtered.length && !state.scDone) prefetchNextCardsAudio(filtered, getPackIdx(state.activePack));
+    scheduleSaveResume();
     return;
   }
 
@@ -2826,6 +2829,7 @@ function renderPackDetail(){
   }
   document.getElementById('appView').innerHTML=html;
   updatePackAudioBtnLive();
+  scheduleSaveResume();
 }
 
 // =========================================================
@@ -3199,6 +3203,7 @@ function renderVerbsTab(){
     document.getElementById('verbCardsStage').innerHTML=renderSingleCardStage(filtered, 'فعل‌های آلمانی', null);
     attachSingleCardSwipe();
     if(filtered.length && !state.scDone) prefetchNextCardsAudio(filtered, state.verbIdx);
+    scheduleSaveResume();
     return;
   }
 
@@ -3263,6 +3268,7 @@ function renderVerbsTab(){
     }
   }
   listBox.innerHTML=listHtml;
+  scheduleSaveResume();
 }
 
 let _verbDeb=null;
@@ -3822,6 +3828,7 @@ function renderActiveSession(){
   `;
 
   if(!isChoiceMode && s.flipped) attachSwipeHandlers();
+  scheduleSaveResume();
 }
 
 function attachSwipeHandlers(){
@@ -3990,6 +3997,7 @@ function setSearchAlpha(ch){
 function renderApp(){
   if(state.activeWordId){
     renderWordPage();
+    scheduleSaveResume();
     return;
   }
   if(state.tab==='lessons'){
@@ -4002,6 +4010,7 @@ function renderApp(){
   }else{
     renderSearchTab();
   }
+  scheduleSaveResume();
 }
 
 // =========================================================
@@ -4079,21 +4088,368 @@ try{
 
 // Splash controller is inline in index.html for instant frame-1 animation!
 
-// Async Boot: Instant Theme + Fast Active-Level Decompression (~20ms) + Silent Background Hydration
+
+// =========================================================
+// EXACT LAST-WORD RESUME ENGINE (v3.7)
+// =========================================================
+const RESUME_STATE_KEY='de_hub_resume_v37';
+const AUTO_RESUME_KEY='de_hub_auto_resume_v37';
+let _resumeReady=false;
+let _resumeSaveTimer=null;
+let _scrollResumeTimer=null;
+
+function isAutoResumeEnabled(){
+  try{ return localStorage.getItem(AUTO_RESUME_KEY)!=='0'; }catch(e){ return true; }
+}
+function toggleAutoResume(enabled){
+  try{
+    localStorage.setItem(AUTO_RESUME_KEY, enabled?'1':'0');
+    if(!enabled) localStorage.removeItem(RESUME_STATE_KEY);
+    else saveResumeStateNow();
+  }catch(e){}
+  showToast(
+    enabled?'برنامه از آخرین کلمهٔ مطالعه‌شده باز می‌شود':'برنامه همیشه از صفحهٔ اصلی درس‌ها باز می‌شود',
+    enabled?'📌 ادامهٔ خودکار روشن':'🏠 شروع از خانه',
+    enabled?'t-human':'t-tts',
+    1800
+  );
+}
+
+function findTopVisibleWordId(){
+  const cards=document.querySelectorAll('.wcard[data-wid]');
+  if(!cards.length) return '';
+  const threshold=112;
+  let best=cards[0];
+  for(let i=0;i<cards.length;i++){
+    const r=cards[i].getBoundingClientRect();
+    if(r.bottom > threshold + 20){ best=cards[i]; break; }
+  }
+  return best?(best.getAttribute('data-wid')||''):'';
+}
+
+function collectResumeSnapshot(){
+  const snap={
+    v:1,
+    ts:Date.now(),
+    level:activeLevel,
+    tab:state.tab,
+    activePack:state.activePack||null,
+    packFilter:state.packFilter||'all',
+    onlyUnmastered:!!state.onlyUnmastered,
+    quizMask:!!state.quizMask,
+    activeWordId:state.activeWordId||null,
+    activeWordLvl:state.activeWordId?(ID_INDEX.get(state.activeWordId)?.lvl||activeLevel):null,
+    wordReturnTab:state.wordReturnTab||'search',
+    verbFilter:state.verbFilter||'all',
+    verbQuery:state.verbQuery||'',
+    verbIdx:state.verbIdx||0,
+    searchScope:state.searchScope||'all',
+    searchQuery:state.searchQuery||'',
+    searchKind:state.searchKind||'all',
+    searchAlpha:state.searchAlpha||'',
+    limit:state.limit||45,
+    scrollY:Math.max(0, Math.round(window.scrollY||0)),
+    cardWordId:'',
+    cardIdx:0,
+    listWordId:'',
+    revMode:state.revMode||'standard',
+    revDeck:state.revDeck||'smart',
+    revSize:(state.revSize!==undefined)?state.revSize:20,
+    session:null
+  };
+
+  if(!state.activeWordId && !state.scDone){
+    if(state.tab==='lessons' && state.activePack && prefs.studyLayout!=='list'){
+      const idx=getPackIdx(state.activePack);
+      const item=(scContext==='pack' && scCurrentList[idx])?scCurrentList[idx]:null;
+      snap.cardIdx=idx;
+      snap.cardWordId=item?item.id:'';
+    }else if(state.tab==='verbs' && prefs.verbLayout==='cards'){
+      const idx=state.verbIdx||0;
+      const item=(scContext==='verbs' && scCurrentList[idx])?scCurrentList[idx]:null;
+      snap.cardIdx=idx;
+      snap.cardWordId=item?item.id:'';
+    }else if((state.tab==='lessons' && state.activePack && prefs.studyLayout==='list') || (state.tab==='verbs' && prefs.verbLayout!=='cards')){
+      snap.listWordId=findTopVisibleWordId();
+    }
+  }
+
+  if(state.tab==='review' && state.session && !state.session.done && Array.isArray(state.session.queue) && state.session.queue.length){
+    const s=state.session;
+    snap.session={
+      qIds:s.queue.map(x=>x.id),
+      idx:s.idx,
+      totalInit:s.totalInit||s.queue.length,
+      flipped:!!s.flipped,
+      artPicked:s.artPicked||null,
+      prepPicked:s.prepPicked||null,
+      rightCnt:s.rightCnt||0,
+      againCnt:s.againCnt||0,
+      mode:s.mode||'standard',
+      deckTitle:s.deckTitle||''
+    };
+  }
+  return snap;
+}
+
+function saveResumeStateNow(){
+  if(!_resumeReady || !isAutoResumeEnabled()) return;
+  try{
+    localStorage.setItem(RESUME_STATE_KEY, JSON.stringify(collectResumeSnapshot()));
+  }catch(e){}
+}
+
+function scheduleSaveResume(){
+  if(!_resumeReady || !isAutoResumeEnabled()) return;
+  clearTimeout(_resumeSaveTimer);
+  _resumeSaveTimer=setTimeout(saveResumeStateNow, 120);
+}
+
+function scrollToRestoredWord(listWordId, fallbackY){
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      if(listWordId){
+        const el=document.querySelector(`.wcard[data-wid="${CSS.escape(listWordId)}"]`);
+        if(el){
+          const top=el.getBoundingClientRect().top + window.scrollY - 110;
+          window.scrollTo({top:Math.max(0, top), behavior:'instant'});
+          return;
+        }
+      }
+      if(fallbackY && fallbackY>0){
+        window.scrollTo({top:fallbackY, behavior:'instant'});
+      }
+    });
+  });
+}
+
+function runAfterSplash(fn){
+  if(typeof fn!=='function') return;
+  if(window.babaDismissed){
+    setTimeout(()=>{ try{ fn(); }catch(e){} }, 120);
+  }else{
+    window.__onBabaSplashDone=fn;
+  }
+}
+
+async function applyResumeStateIfAny(){
+  const params=new URLSearchParams(location.search);
+  if(params.get('tab') || params.get('level')) return null;
+  if(!isAutoResumeEnabled()) return null;
+
+  const snap=safeJsonParse(RESUME_STATE_KEY, null);
+  if(!snap || typeof snap!=='object') return null;
+
+  // Switch to saved level first if needed
+  if(snap.level && LEVEL_ORDER.includes(snap.level) && snap.level!==activeLevel){
+    loadLevelContext(snap.level);
+    setTheme(prefs.theme);
+  }
+  await ensureLevelLoaded(activeLevel);
+  DATA=ALL_DATA[activeLevel];
+
+  // If saved on a word from another level (e.g. via global search), load that level too
+  if(snap.activeWordId && snap.activeWordLvl && LEVEL_ORDER.includes(snap.activeWordLvl) && !LEVEL_LOADED[snap.activeWordLvl]){
+    await ensureLevelLoaded(snap.activeWordLvl);
+  }
+
+  const validTab=['lessons','verbs','review','search'].includes(snap.tab)?snap.tab:'lessons';
+  state.tab=validTab;
+  state.quizMask=!!snap.quizMask;
+  state.revMode=snap.revMode||'standard';
+  state.revDeck=snap.revDeck||'smart';
+  state.revSize=(snap.revSize!==undefined)?snap.revSize:20;
+  state.verbFilter=snap.verbFilter||'all';
+  state.verbQuery=snap.verbQuery||'';
+  state.searchScope=(snap.searchScope==='current')?'current':'all';
+  state.searchQuery=snap.searchQuery||'';
+  state.searchKind=snap.searchKind||'all';
+  state.searchAlpha=snap.searchAlpha||'';
+  sanitizeB2State();
+
+  document.querySelectorAll('.btab').forEach(b=>b.classList.toggle('active', b.dataset.tab===state.tab));
+
+  let afterRenderAction=null;
+
+  // 1. Dedicated Word Page
+  if(snap.activeWordId && ID_INDEX.has(snap.activeWordId)){
+    state.activeWordId=snap.activeWordId;
+    state.wordReturnTab=['lessons','verbs','review','search'].includes(snap.wordReturnTab)?snap.wordReturnTab:'search';
+    try{
+      history.replaceState({home:true}, '', location.pathname+location.search);
+      history.pushState({wid:state.activeWordId, tab:state.wordReturnTab}, '', '#w-'+state.activeWordId);
+    }catch(e){}
+    const item=ID_INDEX.get(state.activeWordId)?.item;
+    if(item && prefs.cardAutoAudio!==false){
+      afterRenderAction=()=>runAfterSplash(()=>{
+        if(state.activeWordId===item.id){
+          speakDe(item.lm, document.getElementById('scLemmaBtn')||null, true);
+        }
+      });
+    }
+    return afterRenderAction;
+  }
+
+  // 2. Lesson / Pack Detail
+  if(state.tab==='lessons' && snap.activePack){
+    const pkItems=getPackItems(snap.activePack);
+    if(pkItems.length){
+      state.activePack=snap.activePack;
+      state.packFilter=snap.packFilter||'all';
+      state.onlyUnmastered=!!snap.onlyUnmastered;
+      state.scDone=false;
+      state.scAnim='';
+      state.limit=Math.max(60, snap.limit||60);
+      let filtered=(state.packFilter==='all')?pkItems:pkItems.filter(x=>x.k===state.packFilter);
+      if(state.onlyUnmastered) filtered=filtered.filter(x=>!isMastered(x));
+
+      if(prefs.studyLayout!=='list'){
+        let targetIdx=Math.max(0, Math.min(filtered.length-1, Number(snap.cardIdx||0)));
+        if(snap.cardWordId){
+          const fi=filtered.findIndex(x=>x.id===snap.cardWordId);
+          if(fi>=0) targetIdx=fi;
+        }
+        setPackIdx(state.activePack, Math.max(0, targetIdx));
+        const targetItem=filtered[targetIdx];
+        if(targetItem && prefs.cardAutoAudio!==false){
+          afterRenderAction=()=>runAfterSplash(()=>{
+            if(state.tab==='lessons' && state.activePack===snap.activePack && prefs.studyLayout!=='list' && !state.scDone){
+              speakDe(targetItem.lm, document.getElementById('scLemmaBtn')||null, true);
+            }
+          });
+        }
+      }else{
+        if(snap.listWordId){
+          const li=filtered.findIndex(x=>x.id===snap.listWordId);
+          if(li>=state.limit) state.limit=li+20;
+        }
+        afterRenderAction=()=>scrollToRestoredWord(snap.listWordId, snap.scrollY);
+      }
+      try{
+        history.replaceState({home:true}, '', location.pathname+location.search);
+        history.pushState({pk:state.activePack}, '', '#'+state.activePack);
+      }catch(e){}
+      return afterRenderAction;
+    }
+  }
+
+  // 3. Verbs Tab
+  if(state.tab==='verbs'){
+    const allV=getCachedVerbs();
+    const baseFiltered=(state.verbFilter==='all')?allV:allV.filter(x=>{
+      const f=state.verbFilter;
+      if(f==='b2_noge') return !!x.vnoge;
+      if(f==='b2_passiv') return x.vptp==='yes';
+      if(f==='b2_nopassiv') return x.vptp==='no';
+      if(f==='b2_zu') return !!x.vzu;
+      return (x.vtg||[]).includes(f);
+    });
+    const filtered=sortPrefixMatches(baseFiltered, state.verbQuery.trim(), true);
+    state.limit=Math.max(45, snap.limit||45);
+    if(prefs.verbLayout==='cards'){
+      let targetIdx=Math.max(0, Math.min(filtered.length-1, Number(snap.verbIdx||snap.cardIdx||0)));
+      if(snap.cardWordId){
+        const fi=filtered.findIndex(x=>x.id===snap.cardWordId);
+        if(fi>=0) targetIdx=fi;
+      }
+      state.verbIdx=Math.max(0, targetIdx);
+      const targetItem=filtered[targetIdx];
+      if(targetItem && prefs.cardAutoAudio!==false){
+        afterRenderAction=()=>runAfterSplash(()=>{
+          if(state.tab==='verbs' && prefs.verbLayout==='cards' && !state.scDone){
+            speakDe(targetItem.lm, document.getElementById('scLemmaBtn')||null, true);
+          }
+        });
+      }
+    }else{
+      if(snap.listWordId){
+        const li=filtered.findIndex(x=>x.id===snap.listWordId);
+        if(li>=state.limit) state.limit=li+20;
+      }
+      afterRenderAction=()=>scrollToRestoredWord(snap.listWordId, snap.scrollY);
+    }
+    return afterRenderAction;
+  }
+
+  // 4. Active Review / Leitner Flashcard Session
+  if(state.tab==='review' && snap.session && Array.isArray(snap.session.qIds)){
+    const queue=snap.session.qIds.map(id=>ID_INDEX.get(id)?.item).filter(Boolean);
+    const idx=Number(snap.session.idx||0);
+    if(queue.length && idx>=0 && idx<queue.length){
+      state.session={
+        queue,
+        idx,
+        totalInit:snap.session.totalInit||queue.length,
+        flipped:!!snap.session.flipped,
+        artPicked:snap.session.artPicked||null,
+        prepPicked:snap.session.prepPicked||null,
+        rightCnt:snap.session.rightCnt||0,
+        againCnt:snap.session.againCnt||0,
+        done:false,
+        mode:snap.session.mode||'standard',
+        deckTitle:snap.session.deckTitle||getDeckTitle(state.revDeck)
+      };
+      if(prefs.fcAutoAudio && !state.session.flipped){
+        const cur=queue[idx];
+        if(cur && (state.session.mode==='standard' || state.session.mode==='verb_b2' || state.session.mode==='prep_case')){
+          afterRenderAction=()=>runAfterSplash(()=>{
+            if(state.tab==='review' && state.session && !state.session.done){
+              speakDe(cur.lm, null, true);
+            }
+          });
+        }
+      }
+      return afterRenderAction;
+    }
+  }
+
+  // 5. Home or Search Scroll Restore
+  state.limit=Math.max(45, snap.limit||45);
+  if(snap.scrollY && snap.scrollY>0){
+    afterRenderAction=()=>scrollToRestoredWord('', snap.scrollY);
+  }
+  return afterRenderAction;
+}
+
+// Save immediately whenever Android backgrounds/closes the app or user scrolls in list mode
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='hidden') saveResumeStateNow();
+});
+window.addEventListener('pagehide', saveResumeStateNow);
+window.addEventListener('beforeunload', saveResumeStateNow);
+window.addEventListener('scroll', ()=>{
+  if(!_resumeReady) return;
+  clearTimeout(_scrollResumeTimer);
+  _scrollResumeTimer=setTimeout(saveResumeStateNow, 260);
+}, {passive:true});
+
+// Async Boot: Instant Theme + Exact Last-Word Resume + Fast Active-Level Decompression
 setTheme(prefs.theme);
 renderLevelBar();
 (async function bootApp(){
   try{
-    await ensureLevelLoaded(activeLevel);
-    DATA=ALL_DATA[activeLevel];
+    let afterRenderAction=null;
+    try{
+      afterRenderAction=await applyResumeStateIfAny();
+    }catch(e){
+      await ensureLevelLoaded(activeLevel);
+      DATA=ALL_DATA[activeLevel];
+    }
+    if(!LEVEL_LOADED[activeLevel]){
+      await ensureLevelLoaded(activeLevel);
+      DATA=ALL_DATA[activeLevel];
+    }
     syncB2Buttons();
     updateDueBadge();
     renderLevelBar(activeLevel);
     renderApp();
+    _resumeReady=true;
+    saveResumeStateNow();
+    if(typeof afterRenderAction==='function') afterRenderAction();
     hydrateRemainingLevels();
   }catch(err){
     dismissBabaSplash();
     const v=document.getElementById('appView');
-    if(v) v.innerHTML='<div class="empty-state"><b>مرورگر شما قدیمی است</b><br>برای باز کردن دیتابیس فشردهٔ نسخهٔ ۳.۴ لطفاً از نسخهٔ جدید Chrome یا Edge استفاده کنید.</div>';
+    if(v) v.innerHTML='<div class="empty-state"><b>مرورگر شما قدیمی است</b><br>برای باز کردن دیتابیس فشرده لطفاً از نسخهٔ جدید Chrome یا Edge استفاده کنید.</div>';
   }
 })();
